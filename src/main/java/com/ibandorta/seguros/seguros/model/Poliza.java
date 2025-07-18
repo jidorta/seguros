@@ -37,16 +37,20 @@ public class Poliza {
     @Column(name="fecha_fin")
     private LocalDate fechaFin;
 
+    @Enumerated(EnumType.STRING)
+    private EstadoPoliza estado;
+
     public Poliza() {
     }
 
-    public Poliza(Long id, String numeroPoliza, String tipo, BigDecimal prima, LocalDate fechaInicio, LocalDate fechaFin) {
+    public Poliza(Long id, String numeroPoliza, String tipo, BigDecimal prima, LocalDate fechaInicio, LocalDate fechaFin, EstadoPoliza estado) {
         this.id = id;
         this.numeroPoliza = numeroPoliza;
         this.tipo = tipo;
         this.prima = prima;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
+        this.estado = estado;
     }
 
     public Long getId() {
@@ -95,5 +99,13 @@ public class Poliza {
 
     public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public EstadoPoliza getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPoliza estado) {
+        this.estado = estado;
     }
 }

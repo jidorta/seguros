@@ -1,7 +1,10 @@
 package com.ibandorta.seguros.seguros.service;
 
+import com.ibandorta.seguros.seguros.model.EstadoPoliza;
 import com.ibandorta.seguros.seguros.model.Poliza;
 import com.ibandorta.seguros.seguros.repository.PolizaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,7 @@ public class PolizaService {
         if(polizaRepository.existsByNumeroPoliza(poliza.getNumeroPoliza())){
             throw new IllegalArgumentException("El numero de poliza ya existe: " +poliza.getNumeroPoliza());
         }
+        poliza.setEstado(EstadoPoliza.ACTIVA);
         return polizaRepository.save(poliza);
     }
 
@@ -49,6 +53,7 @@ public class PolizaService {
         existente.setPrima(datos.getPrima());
         existente.setFechaInicio(datos.getFechaInicio());
         existente.setFechaFin(datos.getFechaFin());
+        existente.setEstado(datos.getEstado());
         return polizaRepository.save(existente);
     }
 
@@ -63,5 +68,27 @@ public class PolizaService {
                 && p.getFechaFin().isBefore(p.getFechaInicio())) {
     throw new IllegalArgumentException("la fecha fin debe ser posterior a la fecha inicio");
         }
+    }
+
+    public Poliza actualizarEstado(Long polizaId,EstadoPoliza nuevoEstado){
+        Poliza poliza = polizaRepository.findById(polizaId)
+                 .orElseThrow(() -> new IllegalArgumentException("Póliza no encontrada con id: " + polizaId));
+        poliza.setEstado(nuevoEstado);
+        return polizaRepository.save(poliza);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Poliza> listarPorEstado(EstadoPoliza estado){
+        return polizaRepository.findByEstado(estado);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Poliza>buscarPorNumero(String texto){
+        return polizaRepository.findByNumeroPolizaContainingIgnoreCase(texto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Poliza> listarPorEstadoPaginado(EstadoPoliza estado, Pageable pageable){
+        return polizaRepository.findByEstado(estado,pageable);
     }
 }

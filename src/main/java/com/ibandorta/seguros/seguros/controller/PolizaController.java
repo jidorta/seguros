@@ -1,5 +1,7 @@
 package com.ibandorta.seguros.seguros.controller;
 
+import com.ibandorta.seguros.seguros.DTO.ActualizarEstadoRequest;
+import com.ibandorta.seguros.seguros.model.EstadoPoliza;
 import com.ibandorta.seguros.seguros.model.Poliza;
 import com.ibandorta.seguros.seguros.service.PolizaService;
 import jakarta.validation.Valid;
@@ -43,6 +45,32 @@ public class PolizaController {
         polizaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<Poliza> actualizarEstado(
+            @PathVariable Long id,
+            @RequestBody ActualizarEstadoRequest request){
+
+        Poliza polizaActualizada = polizaService.actualizarEstado(id,request.getEstado());
+        return ResponseEntity.ok(polizaActualizada);
+    }
+
+
+    @GetMapping("/estado/{estado}")
+    public ResponseEntity<List<Poliza>>listarporEstado(@PathVariable EstadoPoliza estado){
+        return ResponseEntity.ok(polizaService.listarPorEstado(estado));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Poliza>>buscar(
+            @RequestParam(required = false)String numero){
+
+        if (numero !=null && !numero.isBlank()){
+            return ResponseEntity.ok(polizaService.buscarPorNumero(numero));
+        }
+        return ResponseEntity.ok(polizaService.listar());
+    }
+
 
 
 
