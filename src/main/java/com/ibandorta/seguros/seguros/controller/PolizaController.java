@@ -1,10 +1,15 @@
 package com.ibandorta.seguros.seguros.controller;
 
 import com.ibandorta.seguros.seguros.DTO.ActualizarEstadoRequest;
+import com.ibandorta.seguros.seguros.DTO.PolizaCreateRequest;
 import com.ibandorta.seguros.seguros.model.EstadoPoliza;
 import com.ibandorta.seguros.seguros.model.Poliza;
+import com.ibandorta.seguros.seguros.model.Usuario;
 import com.ibandorta.seguros.seguros.service.PolizaService;
+import com.ibandorta.seguros.seguros.service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,10 +19,15 @@ import java.util.List;
 @RequestMapping("/api/polizas")
 public class PolizaController {
     private final PolizaService polizaService;
+    private final UsuarioService usuarioService;
 
-    public PolizaController(PolizaService polizaService) {
+    public PolizaController(PolizaService polizaService, UsuarioService usuarioService) {
         this.polizaService = polizaService;
+        this.usuarioService = usuarioService;
     }
+
+
+
 
     @GetMapping
     public ResponseEntity<List<Poliza>>listar(){
@@ -30,7 +40,18 @@ public class PolizaController {
     }
 
     @PostMapping
-    public ResponseEntity<Poliza>crear(@Valid @RequestBody Poliza poliza){
+    public ResponseEntity<Poliza>crear(@Valid @RequestBody PolizaCreateRequest req){
+
+        Poliza poliza = new Poliza();
+        poliza.setNumeroPoliza(req.numeroPoliza);
+        poliza.setTipo(req.tipo);
+        poliza.setPrima(req.prima);
+        poliza.setFechaInicio(req.fechaInicio);
+        poliza.setFechaFin(req.fechaFin);
+
+        Usuario u = usuarioService.obtener(req.usuarioId);
+        poliza.setUsuario(u);
+
         return ResponseEntity.ok(polizaService.crear(poliza));
     }
 
@@ -71,6 +92,27 @@ public class PolizaController {
         return ResponseEntity.ok(polizaService.listar());
     }
 
+    @GetMapping("/estado/{estado}/page")
+    public ResponseEntity<Page<Poliza>>listarPorEstadoPaginado(
+            @PathVariable EstadoPoliza estado,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id,asc")String sort){
+
+        //sort = "campo,direccion
+        String[] parts = sort.split(",");
+        String sortField = parts[0];
+        String sortDir = parts.length > 1 ? parts[1] : "asc";
+
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page, size,
+                sortDir.equalsIgnoreCase("desc")
+                        ? org.springframework.data.domain.Sort.by(sortField).descending()
+                        : org.springframework.data.domain.Sort.by(sortField).ascending()
+        );
+
+        return ResponseEntity.ok(polizaService.listarPorEstadoPaginado(estado,pageable));
+    }
 
 
 

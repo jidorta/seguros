@@ -31,7 +31,7 @@ public class PolizaService {
 
     @Transactional
     public Poliza crear(Poliza poliza){
-        validarFechas(poliza);
+       // validarFechas(poliza);
         if(polizaRepository.existsByNumeroPoliza(poliza.getNumeroPoliza())){
             throw new IllegalArgumentException("El numero de poliza ya existe: " +poliza.getNumeroPoliza());
         }
@@ -91,4 +91,24 @@ public class PolizaService {
     public Page<Poliza> listarPorEstadoPaginado(EstadoPoliza estado, Pageable pageable){
         return polizaRepository.findByEstado(estado,pageable);
     }
+
+    public List<Poliza>listarPorUsuario(Long usuarioId){
+        return polizaRepository.findByUsuarioId(usuarioId);
+    }
+
+    public Poliza cancelar(Long idPoliza){
+        Poliza poliza = polizaRepository.findById(idPoliza)
+                .orElseThrow(()-> new IllegalArgumentException("Poliza no encontrada con ID:" + idPoliza));
+        poliza.setEstado(EstadoPoliza.CANCELADA);
+       return polizaRepository.save(poliza);
+    }
+    public List<Poliza> buscarPorEstado(EstadoPoliza estado) {
+        return polizaRepository.findByEstado(estado);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Poliza> obtenerTodas() {
+        return polizaRepository.findAll();
+    }
+
 }

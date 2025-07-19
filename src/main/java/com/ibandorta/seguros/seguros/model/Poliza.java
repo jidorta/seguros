@@ -40,10 +40,15 @@ public class Poliza {
     @Enumerated(EnumType.STRING)
     private EstadoPoliza estado;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+
     public Poliza() {
     }
 
-    public Poliza(Long id, String numeroPoliza, String tipo, BigDecimal prima, LocalDate fechaInicio, LocalDate fechaFin, EstadoPoliza estado) {
+
+    public Poliza(Long id, String numeroPoliza, String tipo, BigDecimal prima, LocalDate fechaInicio, LocalDate fechaFin, EstadoPoliza estado, Usuario usuario) {
         this.id = id;
         this.numeroPoliza = numeroPoliza;
         this.tipo = tipo;
@@ -51,6 +56,15 @@ public class Poliza {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.estado = estado;
+        this.usuario = usuario;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public Long getId() {

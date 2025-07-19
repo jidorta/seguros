@@ -18,4 +18,6 @@ public interface PolizaRepository extends JpaRepository<Poliza, Long> {
     List<Poliza>findByNumeroPolizaContainingIgnoreCase(String numeroPoliza);
 
     Page<Poliza> findByEstado(EstadoPoliza estado, Pageable pageable);
+
+    List<Poliza> findByUsuarioId(Long usuarioId);
 }
